@@ -55,6 +55,10 @@ Napi::Value Util::AsyncWorker(const Napi::CallbackInfo &info)
 - [x] pop(由于删除元素的访问问题,函数返回值为void)
 - [x] shift(由于删除元素的访问问题,函数返回值为void)
 - [x] unshift
+- [ ] splice
+- [ ] toString
+- [ ] flat
+- [ ] flatMap
 ```
 std::vector<int> input = {1, 2, 3, 4, 5};
 AddonTemplate::Array array(input);
