@@ -14,12 +14,12 @@ public:
 private:
     static Napi::FunctionReference constructor;
     Napi::Value AsyncWorker(const Napi::CallbackInfo &info);
-    Napi::Value Map(const Napi::CallbackInfo &info);
+    Napi::Value map(const Napi::CallbackInfo &info);
 };
 
 Napi::Object Util::Init(Napi::Env env, Napi::Object exports)
 {
-    Napi::Function func = DefineClass(env, "Util", {InstanceMethod("AsyncWorker", &Util::AsyncWorker), InstanceMethod("Map", &Util::Map)});
+    Napi::Function func = DefineClass(env, "Util", {InstanceMethod("AsyncWorker", &Util::AsyncWorker), InstanceMethod("map", &Util::map)});
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
     exports.Set("Util", func);
@@ -56,7 +56,7 @@ Napi::Value Util::AsyncWorker(const Napi::CallbackInfo &info)
     return deferred.Promise();
 }
 
-Napi::Value Util::Map(const Napi::CallbackInfo &info)
+Napi::Value Util::map(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
     Napi::Array arr = info[0].As<Napi::Array>();
@@ -66,11 +66,10 @@ Napi::Value Util::Map(const Napi::CallbackInfo &info)
         input.push_back(arr.Get(i).As<Napi::Number>().Uint32Value());
     }
     AddonTemplate::Array array(input);
-    std::vector<double> out = array.map([](int index, int value) {
-                                    return double(value * 2);
-                                })
-                               .print()
-                               .to_vector();
+    std::vector<double> out = array.map([](int value, int index) {
+                                       return double(value * 2);
+                                   })
+                                  .to_vector();
     Napi::Array arr_out = Napi::Array::New(env, out.size());
     for (int i = 0; i < out.size(); i++)
     {
@@ -78,6 +77,81 @@ Napi::Value Util::Map(const Napi::CallbackInfo &info)
     }
     return arr_out;
 }
+
+// Napi::Value Util::fill(const Napi::CallbackInfo &info)
+// {
+//     Napi::Env env = info.Env();
+//     Napi::Array arr = info[0].As<Napi::Array>();
+//     std::vector<int> input;
+//     for (int i = 0; i < arr.Length(); i++)
+//     {
+//         input.push_back(arr.Get(i).As<Napi::Number>().Uint32Value());
+//     }
+//     AddonTemplate::Array array(input);
+//     std::vector<const char *> out = array.fill("test")
+//                                         .to_vector();
+//     Napi::Array arr_out = Napi::Array::New(env, out.size());
+//     for (int i = 0; i < out.size(); i++)
+//     {
+//         arr_out.Set(i, Napi::String::New(env, out[i]));
+//     }
+//     return arr_out;
+// }
+
+// Napi::Value Util::some(const Napi::CallbackInfo &info)
+// {
+//     Napi::Env env = info.Env();
+//     Napi::Array arr = info[0].As<Napi::Array>();
+//     std::vector<int> input;
+//     for (int i = 0; i < arr.Length(); i++)
+//     {
+//         input.push_back(arr.Get(i).As<Napi::Number>().Uint32Value());
+//     }
+//     AddonTemplate::Array array(input);
+//     bool result = array.some([](int value, int index) {
+//         return value > 5;
+//     });
+//     return Napi::Boolean::New(env, result);
+// }
+
+// Napi::Value Util::filter(const Napi::CallbackInfo &info)
+// {
+//     Napi::Env env = info.Env();
+//     Napi::Array arr = info[0].As<Napi::Array>();
+//     std::vector<int> input;
+//     for (int i = 0; i < arr.Length(); i++)
+//     {
+//         input.push_back(arr.Get(i).As<Napi::Number>().Uint32Value());
+//     }
+//     AddonTemplate::Array array(input);
+//     std::vector<int> out = array.filter([](int value, int index) {
+//                                     return value > 5;
+//                                 })
+//                                .to_vector();
+//     Napi::Array arr_out = Napi::Array::New(env, out.size());
+//     for (int i = 0; i < out.size(); i++)
+//     {
+//         arr_out.Set(i, Napi::Number::New(env, out[i]));
+//     }
+//     return arr_out;
+// }
+
+// Napi::Value Util::reduce(const Napi::CallbackInfo &info)
+// {
+//     Napi::Env env = info.Env();
+//     Napi::Array arr = info[0].As<Napi::Array>();
+//     std::vector<int> input;
+//     for (int i = 0; i < arr.Length(); i++)
+//     {
+//         input.push_back(arr.Get(i).As<Napi::Number>().Uint32Value());
+//     }
+//     AddonTemplate::Array array(input);
+//     int out = array.reduce([](int out, int value, int index) {
+//         return out += value;
+//     },
+//                            0);
+//     return Napi::Number::New(env, out);
+// }
 
 // Initialize native add-on
 Napi::Object Init(Napi::Env env, Napi::Object exports)

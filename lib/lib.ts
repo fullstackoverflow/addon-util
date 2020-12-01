@@ -12,7 +12,7 @@ export class Util extends _Util {
     }
 
     Map(input: number[]): number[] {
-        const out = super.Map(input);
+        const out = super.map(input);
         return out;
     }
 }

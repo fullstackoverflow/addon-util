@@ -34,6 +34,10 @@ namespace AddonTemplate
             {
                 Napi::AsyncWorker::SetError(str);
             }
+            catch (...)
+            {
+                Napi::AsyncWorker::SetError("Unknow Error");
+            }
         }
 
         void OnOK()
