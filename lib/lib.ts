@@ -10,9 +10,4 @@ export class Util extends _Util {
         const { result, tag } = await super.AsyncWorker(input_1, input_2);
         return { result, tag };
     }
-
-    Map(input: number[]): number[] {
-        const out = super.map(input);
-        return out;
-    }
 }

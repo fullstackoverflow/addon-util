@@ -1,14 +1,13 @@
 #pragma once
 
 #include <functional>
-#include <napi.h>
 #include <iostream>
 #include <vector>
 #include <algorithm>
 
 namespace AddonTemplate
 {
-    template <typename T, int F = 0>
+    template <typename T = int, int F = 0>
     class Array
     {
     private:
@@ -18,6 +17,11 @@ namespace AddonTemplate
         Array(std::vector<T> v)
         {
             this->v = v;
+        }
+
+        Array(int length)
+        {
+            this->v.resize(length);
         }
 
         ~Array()
@@ -127,23 +131,22 @@ namespace AddonTemplate
             return -1;
         }
 
+        int push(T arg)
+        {
+            this->v.emplace_back(arg);
+            return this->v.size();
+        }
+
         template <typename... Args>
         int push(T arg, Args... args)
         {
-            if (sizeof...(args) > 0)
-            {
-                this->push(args...);
-            }
-            else
-            {
-                this->v.emplace_back(arg);
-            }
-            return this->v.size();
+            this->v.emplace_back(arg);
+            return this->push(args...);
         }
 
         void pop()
         {
-            this->v.erase(this->v.end());
+            this->v.pop_back();
         }
 
         void shift()
@@ -151,38 +154,34 @@ namespace AddonTemplate
             this->v.erase(this->v.begin());
         }
 
+        auto unshift(T arg)
+        {
+            this->v.insert(this->v.begin(), arg);
+            return this->v.size();
+        }
+
         template <typename... Args>
         auto unshift(T arg, Args... args)
         {
-            if (sizeof...(args) > 0)
-            {
-                this->unshift(args...);
-            }
-            else
-            {
-                this->v.insert(this->v.begin(), arg);
-            }
-            return this->v.size();
+            this->v.insert(this->v.begin(), arg);
+            return this->unshift(args...);
         }
 
         auto concat(Array<T> input)
         {
-            std::vector<T> out;
-            out.insert(out.end(), this->v.begin(), this->v.end());
-            out.insert(out.end(), input.to_vector().begin(), input.to_vector().end());
-            return Array<T>(std::move(out));
+            std::vector<T> output_vector;
+            output_vector.insert(output_vector.end(), this->v.begin(), this->v.end());
+            std::vector<T> input_vector = input.to_vector();
+            output_vector.insert(output_vector.end(), input_vector.begin(), input_vector.end());
+            return Array<T>(std::move(output_vector));
         }
 
         void forEach(std::function<void(T element, int index)> f)
         {
-            std::vector<T> out;
             int index = 0;
             for (auto value : this->v)
             {
-                if (f(value, index) == true)
-                {
-                    f(index, std::move(value));
-                }
+                f(std::move(value), index);
                 index++;
             }
         }
@@ -221,27 +220,14 @@ namespace AddonTemplate
             if (begin < 0)
             {
                 begin = this->v.size() + begin;
-                if (begin > 0)
-                {
-                    return Array<T>(std::move(out));
-                }
             }
             if (end < 0)
             {
                 end = this->v.size() + end;
             }
-            int index = 0;
-            for (auto value : this->v)
+            if (end >= begin)
             {
-                if (index > begin && index < end)
-                {
-                    out.push_back(std::move(value));
-                }
-                index++;
-                if (index >= end)
-                {
-                    break;
-                }
+                out = std::vector<T>(this->v.begin() + begin, this->v.begin() + end);
             }
             return Array<T>(std::move(out));
         }

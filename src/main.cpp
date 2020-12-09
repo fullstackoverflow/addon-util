@@ -1,7 +1,6 @@
 #include <napi.h>
 #include <iostream>
-#include "AsyncWorker.hpp"
-#include "Vector.hpp"
+#include "libs/AsyncWorker.hpp"
 #include <functional>
 #include <tuple>
 
@@ -15,11 +14,16 @@ private:
     static Napi::FunctionReference constructor;
     Napi::Value AsyncWorker(const Napi::CallbackInfo &info);
     Napi::Value map(const Napi::CallbackInfo &info);
+    Napi::Value fill(const Napi::CallbackInfo &info);
 };
 
 Napi::Object Util::Init(Napi::Env env, Napi::Object exports)
 {
-    Napi::Function func = DefineClass(env, "Util", {InstanceMethod("AsyncWorker", &Util::AsyncWorker), InstanceMethod("map", &Util::map)});
+    Napi::Function func = DefineClass(env, "Util", {
+        InstanceMethod("AsyncWorker", &Util::AsyncWorker), 
+        // InstanceMethod("map", &Util::map),
+        // InstanceMethod("fill", &Util::fill)
+        });
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
     exports.Set("Util", func);
@@ -56,29 +60,7 @@ Napi::Value Util::AsyncWorker(const Napi::CallbackInfo &info)
     return deferred.Promise();
 }
 
-Napi::Value Util::map(const Napi::CallbackInfo &info)
-{
-    Napi::Env env = info.Env();
-    Napi::Array arr = info[0].As<Napi::Array>();
-    std::vector<int> input;
-    for (int i = 0; i < arr.Length(); i++)
-    {
-        input.push_back(arr.Get(i).As<Napi::Number>().Uint32Value());
-    }
-    AddonTemplate::Array array(input);
-    std::vector<double> out = array.map([](int value, int index) {
-                                       return double(value * 2);
-                                   })
-                                  .to_vector();
-    Napi::Array arr_out = Napi::Array::New(env, out.size());
-    for (int i = 0; i < out.size(); i++)
-    {
-        arr_out.Set(i, Napi::Number::New(env, out[i]));
-    }
-    return arr_out;
-}
-
-// Napi::Value Util::fill(const Napi::CallbackInfo &info)
+// Napi::Value Util::map(const Napi::CallbackInfo &info)
 // {
 //     Napi::Env env = info.Env();
 //     Napi::Array arr = info[0].As<Napi::Array>();
@@ -88,6 +70,23 @@ Napi::Value Util::map(const Napi::CallbackInfo &info)
 //         input.push_back(arr.Get(i).As<Napi::Number>().Uint32Value());
 //     }
 //     AddonTemplate::Array array(input);
+//     std::vector<double> out = array.map([](int value, int index) {
+//                                        return double(value * 2);
+//                                    })
+//                                   .to_vector();
+//     Napi::Array arr_out = Napi::Array::New(env, out.size());
+//     for (int i = 0; i < out.size(); i++)
+//     {
+//         arr_out.Set(i, Napi::Number::New(env, out[i]));
+//     }
+//     return arr_out;
+// }
+
+// Napi::Value Util::fill(const Napi::CallbackInfo &info)
+// {
+//     Napi::Env env = info.Env();
+//     Napi::Array arr = info[0].As<Napi::Array>();
+//     AddonTemplate::Array array<int>(5);
 //     std::vector<const char *> out = array.fill("test")
 //                                         .to_vector();
 //     Napi::Array arr_out = Napi::Array::New(env, out.size());

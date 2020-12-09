@@ -18,14 +18,4 @@ export class UtilTest {
 		Expect(result).toEqual(3);
 		Expect(tag).toEqual(true);
 	}
-
-	@Test('Test Map')
-	@Timeout(50000)
-	public async t2() {
-		const input = [10, 10, 10, 10, 10];
-		const out = this.instance.Map(input).reverse();
-		for (let i = 0; i < input.length; i++) {
-			Expect(out[i]).toEqual(input[i]);
-		}
-	}
 }
