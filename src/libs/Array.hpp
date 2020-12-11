@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <optional>
 
 namespace AddonTemplate
 {
@@ -71,7 +72,7 @@ namespace AddonTemplate
             return Array<T>(std::move(out));
         }
 
-        T find(std::function<bool(T element, int index)> f)
+        std::optional<T> find(std::function<bool(T element, int index)> f)
         {
             std::vector<T> out;
             int index = 0;
@@ -80,11 +81,11 @@ namespace AddonTemplate
                 bool result = f(value, index);
                 if (result == true)
                 {
-                    return value;
+                    return std::optional<T>{value};
                 }
                 index++;
             }
-            return NULL;
+            return std::nullopt;
         }
 
         bool includes(T element)

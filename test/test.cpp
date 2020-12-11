@@ -69,14 +69,14 @@ TEST_CASE("find should worker", "[Vector]")
 {
     std::vector test = {1, 2, 3};
     AddonTemplate::Array array(test);
-    int result = array.find([](int ele, int index) {
+    std::optional<int> result = array.find([](int ele, int index) {
         return ele == 2 || ele == 3;
     });
     REQUIRE(result == 2);
-    int result2 = array.find([](int ele, int index) {
+    std::optional<int> result2 = array.find([](int ele, int index) {
         return ele == 4;
     });
-    REQUIRE(result2 == NULL);
+    REQUIRE(result2.has_value() == false);
 }
 
 TEST_CASE("includes should worker", "[Vector]")

@@ -5,7 +5,7 @@
   "main": "dist/lib.js",
   "scripts": {
     "js-test": "npm run build&&alsatian ./test/*.ts",
-    "c++-test": "clang++-11 -std=c++17 -Wall -I/root/util/test -o test-cli test/test.cpp&&./test-cli --success&&rm test-cli",
+    "c++-test": "clang++-11 -std=c++17 -stdlib=libc++ -cxx-isystem /usr/lib/llvm-12/include/c++/v1/ -L/usr/lib/llvm-12/lib/ -Wall -o test-cli test/test.cpp&&./test-cli --success&&rm test-cli",
     "test":"npm run js-test&&npm run c++-test",
     "build": "tsc -p tsconfig.build.json&&cmake-js rebuild"
   },
